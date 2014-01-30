@@ -18,6 +18,11 @@ $.fn.jProcessingJS = function(params){
 	c'est tout à fait faisable en dehors des images gérées en interne... pour du son par exemple.
 	pas sûr que ce soit très utile.
 
+	- la propriété mousePressed ne se met pas à jour ! vu que je ne m'en suis pas occupé.
+
+	- en mode responsive, écoute du resize de la canvas au lieu de window ?
+	http://benalman.com/code/projects/jquery-resize/examples/resize/
+
 	*/
 
 	// on n'agit que si la cible existe...
@@ -113,11 +118,12 @@ $.fn.jProcessingJS = function(params){
 					sketch.canvasY = posRef.top;
 				});
 				$(window).trigger('resize'); // juste après le setup, du coup -> override le size() du setup		
-			} else {
+			} else { console.log('responsive mode');
 				$(window).resize(function(){
 					var posRef = sketch.canvas.offset(); // update coords canvas
 					sketch.canvasX = posRef.left;
 					sketch.canvasY = posRef.top;
+					sketch.size( sketch.canvas.width(), sketch.canvas.height(), sketch.externals.context );
 				});
 				$(window).trigger('resize');
 			}
@@ -137,12 +143,14 @@ $.fn.jProcessingJS = function(params){
 			if(params.preventMouse){ // preventMouse même si pas d'écouteurs par ailleurs
 				if(typeof sketch.mousePressed == "undefined"){
 					$(document).on('mousedown touchstart', function(e){
-						e.preventDefault();
+						e.preventDefault();		
+						sketch.mousePressed	= true;	
 					});
 				}
 				if(typeof sketch.mouseReleased == "undefined" && typeof sketch.mouseClicked == "undefined"){
 					$(document).on('mouseup touchend', function(e){
 						e.preventDefault();
+						sketch.mousePressed	= false;	
 					});
 				}
 			}
